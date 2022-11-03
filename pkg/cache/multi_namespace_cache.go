@@ -296,17 +296,23 @@ type multiNamespaceInformer struct {
 var _ Informer = &multiNamespaceInformer{}
 
 // AddEventHandler adds the handler to each namespaced informer.
-func (i *multiNamespaceInformer) AddEventHandler(handler toolscache.ResourceEventHandler) {
+func (i *multiNamespaceInformer) AddEventHandler(handler toolscache.ResourceEventHandler) (toolscache.ResourceEventHandlerRegistration, error) {
 	for _, informer := range i.namespaceToInformer {
-		informer.AddEventHandler(handler)
+		if _, err := informer.AddEventHandler(handler); err != nil {
+			return nil, err
+		}
 	}
+	return nil, nil
 }
 
 // AddEventHandlerWithResyncPeriod adds the handler with a resync period to each namespaced informer.
-func (i *multiNamespaceInformer) AddEventHandlerWithResyncPeriod(handler toolscache.ResourceEventHandler, resyncPeriod time.Duration) {
+func (i *multiNamespaceInformer) AddEventHandlerWithResyncPeriod(handler toolscache.ResourceEventHandler, resyncPeriod time.Duration) (toolscache.ResourceEventHandlerRegistration, error) {
 	for _, informer := range i.namespaceToInformer {
-		informer.AddEventHandlerWithResyncPeriod(handler, resyncPeriod)
+		if _, err := informer.AddEventHandlerWithResyncPeriod(handler, resyncPeriod); err != nil {
+			return nil, err
+		}
 	}
+	return nil, nil
 }
 
 // AddIndexers adds the indexer for each namespaced informer.
